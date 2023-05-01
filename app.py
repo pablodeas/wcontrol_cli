@@ -14,7 +14,6 @@ domingo_c = domingo.strftime("%d, %B %Y")
 limite_semanal = 120
 
 # TELA DE ABERTURA - MENU
-
 print(f"""
 Bem vindo ao Controlador de Gastos Semanais!
 
@@ -24,15 +23,13 @@ Estamos no dia: {hoje_c}
 
 Proximo domingo será: {domingo_c}
 """)
+
 def menu():
     print(f"""
-* Escolha uma opção abaixo *
-
+##### Escolha uma opção abaixo #####
 1 - Inserir novo valor.
 2 - Verificar valor disponível.
-3 - Sair.
-""")
-
+3 - Sair.""")
 
 def new_value(file_path, key, value):
     with open(file_path, 'r') as f:
@@ -42,43 +39,36 @@ def new_value(file_path, key, value):
         json.dump(data, f)
     return "Tudo certo!"
 
-
 def sum_values(file_path):
     with open(file_path, 'r') as f:
         data = json.load(f)
         total = 0
     for value in data.values():
         total += value
-    print("R$", limite_semanal - total)
+    print("Disponível: R$",limite_semanal - total)
 
 menu()
-choose = int(input("-> "))
+choose = int(input(" > "))
 
-while choose != 3:
+while choose > 0:
     if choose == 1:
         valor = int(input("Digite o valor: \n"))
-        dia = input("Digite o dia: \n")
+        dia = input("Digite o dia: (Formato: DIA-MÊS) \n")
         new_value('dados.json', dia, valor)
         menu()
-        choose = int(input("-> "))
-    else:
-        print()
-    
-    if choose == 2:
+        choose = int(input(" > "))
+    elif choose == 2:
         sum_values('dados.json')
         menu()
-        choose = int(input("-> "))
-    else:
-        print()
-    
-    if choose == 3:
-        print("Saindo... \n")
-    else:
-        print()
-    
-    if choose == 0 or choose >= 4:
+        choose = int(input(" > "))
+    elif choose == 3:
+        print("Programa finalizado!")
+        sys.exit()
+    elif choose == 0 or choose >= 4:
         print("Você escolheu uma opção errada, tente novamente!")
+        menu()
+        choose = int(input(" > "))
     else:
-        print()
+        sys.exit()
 else:
     sys.exit()
