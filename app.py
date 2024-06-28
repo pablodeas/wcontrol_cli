@@ -9,6 +9,12 @@ DATABASE = os.getenv("DATABASE")
 HOST = os.getenv("HOST")
 PORT = os.getenv("PORT")
 
+@click.group()
+def cli():
+    """> Program to keep control of weekly financial expenses."""
+    pass
+
+@cli.command()
 def list():
     try:
         with psycopg2.connect(dbname=DATABASE, user=USER, password=PASSWORD, host=HOST, port=int(PORT)) as conn:
@@ -23,6 +29,9 @@ def list():
     except Exception as e:
         print(f"> An error occurred: {e}")
 
+@cli.command()
+@click.argument('value', type=float)
+@click.argument('desc')
 def insert(value, desc):
     try:
         with psycopg2.connect(dbname=DATABASE, user=USER, password=PASSWORD, host=HOST, port=int(PORT)) as conn:
@@ -39,6 +48,8 @@ def insert(value, desc):
     except Exception as e:
         print(f"> An error occurred: {e}")
 
+@cli.command()
+@click.argument('id', type=float)
 def delete(id):
     try:
         with psycopg2.connect(dbname=DATABASE, user=USER, password=PASSWORD, host=HOST, port=int(PORT)) as conn:
@@ -46,12 +57,13 @@ def delete(id):
                 cur.execute("""
                     DELETE FROM public.register where Id = %s;
                     """,
-                    (id))
+                    (id,))
                 conn.commit()
 
     except Exception as e:
         print(f"> An error occurred: {e}")
 
+@cli.command()
 def clear():
     try:
         case = input("> WARNING - You will clear all values. Are you sure? (Y)-Yes or (N)-No\n> ")
@@ -70,40 +82,45 @@ def clear():
     except Exception as e:
         print(f"> An error occurred: {e}")
 
+@cli.command()
+@click.argument('value', type=float)
+def week(value):
+    try:
+        with psycopg2.connect(dbname=DATABASE, user=USER, password=PASSWORD, host=HOST, port=int(PORT)) as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    UPDATE public.week SET const = %s WHERE id = 1;
+                    """,
+                    (value,))
+                print("> Week value updated.")
+                conn.commit()
+
+    except Exception as e:
+        print(f"> An error occurred: {e}")
+
+@cli.command()
 def check():
     try:
         with psycopg2.connect(dbname=DATABASE, user=USER, password=PASSWORD, host=HOST, port=int(PORT)) as conn:
             with conn.cursor() as cur:
                 cur.execute("select sum(Value) from public.register")
                 sum = cur.fetchone()
-                if sum[0] is not None or Null:
+                if sum[0] is not None:
                     sum_value = sum[0]
 
                 cur.execute("select const from public.week")
                 week = cur.fetchone()
-                if week[0] is not None or Null:
+                if week[0] is not None:
                     week_value = week[0]
                 
-                left = week_value - sum_value
-                print(f"> Spend: R${sum_value} Week: R${week_value} ->> Left: R${left}")
-                
+                if sum_value is not None and week_value is not None:
+                    left = week_value - sum_value
+                    print(f"> Spend: R${sum_value} Week: R${week_value} ->> Left: R${left}")
+                else:
+                    print("> Data not available.")
 
     except Exception as e:
         print(f"> An error occurred: {e}")
 
-def main():
-    list()
-    
-    #value = int(input("> Value: \n> "))
-    #descr = input("> Descr: \n> ")
-    #insert(value, descr)
-    
-    #id = input(f"> Which Id: \n> ")
-    #delete(id)
-
-    clear()
-
-    #check()
-
 if __name__ == "__main__":
-    main()
+    cli()
