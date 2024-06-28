@@ -18,7 +18,7 @@ def cli():
     """> Program to keep control of weekly financial expenses."""
     pass
 
-@cli.command()
+@cli.command(help="> List items from the register")
 def list():
     try:
         with psycopg2.connect(dbname=DATABASE, user=USER, password=PASSWORD, host=HOST, port=int(PORT)) as conn:
@@ -33,7 +33,7 @@ def list():
     except Exception as e:
         print(f"> An error occurred: {e}")
 
-@cli.command()
+@cli.command(help="> Insert a new item into the register")
 @click.argument('value', type=float)
 @click.argument('desc')
 def insert(value, desc):
@@ -52,7 +52,7 @@ def insert(value, desc):
     except Exception as e:
         print(f"> An error occurred: {e}")
 
-@cli.command()
+@cli.command(help="> Delete an item from the register by Id")
 @click.argument('id', type=float)
 def delete(id):
     try:
@@ -67,7 +67,7 @@ def delete(id):
     except Exception as e:
         print(f"> An error occurred: {e}")
 
-@cli.command()
+@cli.command(help="> Clear all items from the register")
 def clear():
     try:
         case = input("> WARNING - You will clear all values. Are you sure? (Y)-Yes or (N)-No\n> ")
@@ -86,7 +86,7 @@ def clear():
     except Exception as e:
         print(f"> An error occurred: {e}")
 
-@cli.command()
+@cli.command(help="> Update the weekly budget value")
 @click.argument('value', type=float)
 def week(value):
     try:
@@ -102,7 +102,7 @@ def week(value):
     except Exception as e:
         print(f"> An error occurred: {e}")
 
-@cli.command()
+@cli.command(help="> Check the current spend and remaining budget")
 def check():
     try:
         with psycopg2.connect(dbname=DATABASE, user=USER, password=PASSWORD, host=HOST, port=int(PORT)) as conn:
@@ -127,4 +127,4 @@ def check():
         print(f"> An error occurred: {e}")
 
 if __name__ == "__main__":
-    cli()
+    cli(prog_name='app')
