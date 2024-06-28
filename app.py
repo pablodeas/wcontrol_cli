@@ -2,6 +2,10 @@ import psycopg2, os, click
 from datetime import datetime
 from dotenv import load_dotenv
 
+# - Author: Pablo Andrade
+# - Created: 28/06/2024
+# - Version: 0.1.0
+
 load_dotenv()
 USER = os.getenv("USER")
 PASSWORD = os.getenv("PASSWORD")
