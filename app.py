@@ -1,10 +1,14 @@
-import psycopg2, os, click
+import psycopg2, os, click, docker
 from datetime import datetime
 from dotenv import load_dotenv
 
 # - Author: Pablo Andrade
 # - Created: 28/06/2024
-# - Version: 0.1.0
+# - Version: 0.1.1
+
+"""
+    TODO: fix redundancy
+"""
 
 load_dotenv()
 USER = os.getenv("USER")
@@ -12,6 +16,14 @@ PASSWORD = os.getenv("PASSWORD")
 DATABASE = os.getenv("DATABASE")
 HOST = os.getenv("HOST")
 PORT = os.getenv("PORT")
+CONTAINER = os.getenv("CONTAINER")
+
+client = docker.from_env()
+postgre = client.containers.get(CONTAINER)
+if (postgre.status) != "running":
+    postgre.start
+    if (postgre.status) == "running":
+        pass
 
 @click.group()
 def cli():
